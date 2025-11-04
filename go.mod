@@ -1,3 +1,3 @@
-module go-rs-api
+module rs-cli
 
 go 1.25.3

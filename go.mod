@@ -1,3 +1,5 @@
-module rs-cli
+module osrs-cli
 
 go 1.25.3
+
+require golang.org/x/text v0.30.0 // indirect

@@ -1,64 +1,90 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"strings"
+
+	"osrs-cli/helpers"
 )
 
 const help = `
-Usage: ./rs-cli <player_name> [skill_name]
+Usage: ./osrs-cli <player_name> [flags]
+
+Flags:
+  -/--activities         # Show all activities (bosses, minigames, etc.)
+  -/--skills             # Show all skills only
+  -/--activity string    # Show specific activity (e.g., "Kalphite Queen")
+  -/--skill string       # Show specific skill (e.g., "Woodcutting")
 
 Examples:
-  ./rs-cli "Manly Bacon"               # Show player info
-  ./rs-cli "Manly Bacon" "Activities"  # Show all activities (bosses, minigames, etc.)
-  ./rs-cli "Manly Bacon" "Skills"      # Show all skills (only skills)
-  ./rs-cli "Manly Bacon" "Stats"       # Show all hiscore stats
-  ./rs-cli "Manly Bacon" "Woodcutting" # Optional: Show specific skill`
+  ./osrs-cli "Manly Bacon"                             # Show all stats (default)
+  ./osrs-cli "Manly Bacon" --activities                # Show only activities
+  ./osrs-cli "Manly Bacon" --skills                    # Show only skills
+  ./osrs-cli "Manly Bacon" --activity "Kalphite Queen" # Show specific activity
+  ./osrs-cli "Manly Bacon" --skill "Woodcutting"       # Show specific skill`
 
-func Name(rsData *Hiscores) error {
-	fmt.Println("Player Name:", rsData.Name)
-	return nil
+func Name(rsData *Hiscores) (string, error) {
+	formattedName := helpers.FormatName(rsData.Name)
+	return formattedName, nil
 }
 
 func main() {
-	// TODO: Use a proper CLI parser like cobra or urfave/cli for better argument handling
+	// Check if we have at least a player name
 	if len(os.Args) < 2 {
 		fmt.Println(help)
 		return
 	}
 
+	// First argument is always the player name
 	playerName := os.Args[1]
-	var skillName string
+
+	// Parse flags from the remaining arguments (after player name)
+	flagSet := flag.NewFlagSet("rs-cli", flag.ExitOnError)
+	showActivities := flagSet.Bool("activities", false, "Show all activities (bosses, minigames, etc.)")
+	showSkills := flagSet.Bool("skills", false, "Show all skills")
+	activityName := flagSet.String("activity", "", "Show specific activity (e.g., 'Kalphite Queen')")
+	skillName := flagSet.String("skill", "", "Show specific skill (e.g., 'Woodcutting')")
+
+	// Parse flags from arguments after player name
 	if len(os.Args) > 2 {
-		skillName = os.Args[2]
+		flagSet.Parse(os.Args[2:])
 	}
 
 	// Replace spaces with underscores for the API request
-	replaced_player := strings.ReplaceAll(playerName, " ", "_")
-	rsData, err := Api(replaced_player)
+	replacedPlayerName := strings.ReplaceAll(playerName, " ", "_")
+	rsData, err := Api(replacedPlayerName)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 
-	err = Name(rsData)
+	name, err := Name(rsData)
 	if err != nil {
 		fmt.Println("Error:", err)
+		return
 	}
-	if skillName == "" {
-		err, err = AllSkills(rsData), Activities(rsData)
-		if err != nil {
-			fmt.Println("Error:", err)
-		}
+	fmt.Println("Player Name:", name)
+
+	// Handle different display options based on flags
+	switch {
+	case *showActivities:
+		err = GetAllActivities(rsData)
+	case *showSkills:
+		err = GetAllSkills(rsData)
+	case *activityName != "":
+		*activityName = helpers.FormatName(*activityName)
+		err = GetActivity(rsData, *activityName)
+	case *skillName != "":
+		*skillName = helpers.FormatName(*skillName)
+		err = GetSkill(rsData, *skillName)
+	default:
+		err = GetAllStats(rsData)
 	}
 
-	// Call specific skill if provided
-	if skillName != "" {
-		err = GetSkill(rsData, skillName)
-		if err != nil {
-			fmt.Println("Error:", err)
-		}
+	if err != nil {
+		fmt.Println("Error:", err)
 	}
 
 }

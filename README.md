@@ -12,9 +12,10 @@ A simple Go command-line tool for fetching Old School RuneScape hiscores.
 ```
 
 ### Flags
-- `-/--activities`   Show all activities (bosses, minigames, etc.)
-- `-/--skills`       Show all skills only
-- `-/--skill NAME`   Show specific skill (e.g., "Woodcutting")
+- `-/--activities`        Show all activities (bosses, minigames, etc.)
+- `-/--skills`            Show all skills only
+- `-/--activity NAME`     Show specific activity (e.g. Kalphite Queen)
+- `-/--skill NAME`        Show specific skill (e.g., "Woodcutting")
 
 ### Examples
 ```bash

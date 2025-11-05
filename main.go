@@ -41,7 +41,7 @@ func main() {
 	playerName := os.Args[1]
 
 	// Parse flags from the remaining arguments (after player name)
-	flagSet := flag.NewFlagSet("rs-cli", flag.ExitOnError)
+	flagSet := flag.NewFlagSet("osrs-cli", flag.ExitOnError)
 	showActivities := flagSet.Bool("activities", false, "Show all activities (bosses, minigames, etc.)")
 	showSkills := flagSet.Bool("skills", false, "Show all skills")
 	activityName := flagSet.String("activity", "", "Show specific activity (e.g., 'Kalphite Queen')")

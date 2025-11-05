@@ -4,11 +4,20 @@ A simple Go command-line tool for fetching Old School RuneScape hiscores.
 
 ## Features
 - Fetches player stats from OSRS hiscores
-- Supports activities, skills, and individual skill lookup
+- Supports activities, skills, and individual skill or activity lookup
 ## Usage
 
 ```bash
 ./osrs-cli <player_name> [flags]
+
+Player Name: Manly Bacon
+
+┌────────────────┬──────┬───────┐
+│ Name           │ Rank │ Score │
+├────────────────┼──────┼───────┤
+│ Kalphite Queen │  608 │ 4,248 │
+└────────────────┴──────┴───────┘
+
 ```
 
 ### Flags
